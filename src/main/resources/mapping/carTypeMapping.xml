@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kyle.crawler.dao.CarTypeMapper">
+    <resultMap id="carTypeMap" type="CarType">
+        <id property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="carBrandId" column="CAR_BRAND_ID"/>
+        <collection property="cars" column="ID" select="com.kyle.crawler.dao.CarMapper.findListCarByCarTypeId"/>
+    </resultMap>
+
+    <insert id="addCarType" parameterType="CarType">
+        INSERT INTO car_type VALUES (#{id},#{name},#{carBrandId})
+    </insert>
+
+    <select id="findListByCarBrandId" resultMap="carTypeMap" parameterType="java.lang.Integer" useCache="true">
+        SELECT * FROM car_type WHERE CAR_BRAND_ID = #{carBrandId} ORDER BY ID
+    </select>
+
+    <select id="findListCarType" resultMap="carTypeMap" useCache="true">
+        SELECT * FROM car_type ORDER BY ID
+    </select>
+
+    <select id="findById" resultMap="carTypeMap" parameterType="java.lang.Integer">
+        SELECT * FROM car_type WHERE ID = #{id}
+    </select>
+</mapper>
