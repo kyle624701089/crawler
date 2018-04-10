@@ -12,6 +12,7 @@ import com.kyle.crawler.entity.CarType;
 import com.kyle.crawler.service.ICarBrandService;
 import com.kyle.crawler.service.ICarService;
 import com.kyle.crawler.service.ICarTypeService;
+import com.kyle.crawler.utils.Excels2OneUtil;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -208,7 +209,7 @@ public class CrawlerApplicationTests {
 				//过滤掉分割线
 				String ele_0_text = ele_0.text();
 				//装载值
-				List<String> list = new ArrayList<String>();
+				List<String> list = new ArrayList<>();
 				for (int j = 1; j < divs.size(); j++) {
 					list.add(divs.get(j).text());
 				}
@@ -249,11 +250,6 @@ public class CrawlerApplicationTests {
                     @Override
                     public void run() {
                         html(url,carTypeName,hssfWorkbook,webClient);
-                        try{
-                            Thread.sleep(1000);
-                        }catch (InterruptedException e){
-                            e.printStackTrace();
-                        }
                     }
                 });
             }
@@ -264,6 +260,25 @@ public class CrawlerApplicationTests {
             e.printStackTrace();
         }
         executorService.shutdown();
+    }
+
+    @Test
+    public void excelsToOne(){
+        List<CarType> listCarType = typeService.findListCarType();
+        List<String> excelPath = new ArrayList<>();
+        for (CarType type:listCarType) {
+            excelPath.add("C:\\Users\\Administrator\\Desktop\\车型配置大全\\"+type.getName()+".xls");
+        }
+        String outputFileName = "C:\\Users\\Administrator\\Desktop\\车型汇总.xls";
+        Excels2OneUtil.mergeExcel(outputFileName,excelPath);
+    }
+
+    @Test
+    public void sheetsToOne(){
+        List<String> excelPath = new ArrayList<>();
+        excelPath.add("C:\\Users\\Administrator\\Desktop\\车型汇总.xls");
+        String outputFileName = "C:\\Users\\Administrator\\Desktop\\车型sheet汇总.xls";
+        Excels2OneUtil.mergeExcel(outputFileName,excelPath);
     }
 
 
