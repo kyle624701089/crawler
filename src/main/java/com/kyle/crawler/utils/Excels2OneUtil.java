@@ -16,17 +16,10 @@ import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class Excels2OneUtil {
     private final static Log logger = LogFactory.getLog(Excels2OneUtil.class);
     public static void mergeExcel(String outputFileName, List<String> inputFileNameArray) {
-        /*if (inputFileNameArray.size() == 1) {
-            logger.info("至少需要两个文件才能合并，请验证！！！");
-            return;
-        }*/
         try {
             WritableWorkbook outputExcel = Workbook.createWorkbook(new File(outputFileName));
             int index = 0;
@@ -35,8 +28,6 @@ public class Excels2OneUtil {
                 Workbook inputExcel = Workbook.getWorkbook(new FileInputStream(fileName));
                 // 获取excel文件工作簿的工作表数量sheets
                 Sheet[] sheets = inputExcel.getSheets();
-//                ExecutorService executorService = Executors.newFixedThreadPool(50);
-//                new ThreadPoolExecutor(sheets.length,)
                 for (Sheet sheet : sheets) {
                     String sheetName = sheet.getName();
                     WritableSheet writableSheet = outputExcel.createSheet(sheetName, index);
