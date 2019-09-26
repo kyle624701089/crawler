@@ -9,15 +9,19 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.kyle.crawler.entity.Car;
 import com.kyle.crawler.entity.CarBrand;
 import com.kyle.crawler.entity.CarType;
+import com.kyle.crawler.entity.TypeConfig;
 import com.kyle.crawler.service.ICarBrandService;
 import com.kyle.crawler.service.ICarService;
 import com.kyle.crawler.service.ICarTypeService;
+import com.kyle.crawler.service.ITypeConfigService;
 import com.kyle.crawler.utils.Excels2OneUtil;
+import com.mysql.jdbc.util.Base64Decoder;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -26,6 +30,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.*;
@@ -44,6 +49,8 @@ public class CrawlerApplicationTests {
     private ICarTypeService typeService;
     @Resource
     private ICarService carService;
+    @Resource
+    private ITypeConfigService configService;
 
 
     /**
@@ -281,15 +288,127 @@ public class CrawlerApplicationTests {
         Excels2OneUtil.mergeExcel(outputFileName,excelPath);
     }
 
-
-
-    /*@Async("asyncServiceExecutor")
-    public void executeAsync(String url,String carTypeName,HSSFWorkbook hssfWorkbook,WebClient webClient){
-        try{
-            html(url,carTypeName,hssfWorkbook,webClient);
-            Thread.sleep(1000);
-        }catch(Exception e){
-            e.printStackTrace();
+    /*
+    * @Author: sunkai-019
+    * @Description:获取bjev520网站的下拉列表
+    * @Date: 23:19 2019/4/13
+    * @Param: []
+    * @Retrun: void
+    */
+    @Test
+    public void getBjev520Select() throws Exception{
+        WebClient webClient = new WebClient(BrowserVersion.CHROME);
+        // 禁用Css，可避免自动二次請求CSS进行渲染
+        webClient.getOptions().setCssEnabled(false);
+        // 设置支持JavaScript。
+        webClient.getOptions().setJavaScriptEnabled(true);
+        // 4 启动客戶端重定向
+        webClient.getOptions().setRedirectEnabled(true);
+        // 5 js运行错誤時，是否拋出异常
+        webClient.getOptions().setThrowExceptionOnScriptError(false);
+        // 6 设置超时
+        webClient.getOptions().setTimeout(50000);
+        FileOutputStream fileOutputStream = null;
+        Document doc = null;
+        try {
+            //需要同步块依次将网页转换成doc，否则拿到的doc都为空，网页没有生成
+            synchronized (this) {
+                //获取网页
+			String url = "http://www.bjev520.com/jsp/beiqi/pcmap/do/pcMap.jsp";
+//                HtmlPage htmlPage = webClient.getPage(url);
+                // 等待JS驱动dom完成获得还原后的网页
+                webClient.waitForBackgroundJavaScript(1000);
+                //将网页数据装换成doc
+                doc = Jsoup.parse(new File("D:\\projects\\GIT\\crawler\\src\\main\\resources\\bjev520.html"),"UTF-8");
+//                doc = Jsoup.parse(htmlPage.asXml());
+//                doc.getElementById("navul").getElementsByTag("li").get(0).childNodes.get(3).childNodes.get(1).childNodes.get(1).attributes.get("title");
+                //类型
+                Elements elementsByTag = doc.getElementById("navul").getElementsByTag("li");
+                Iterator<Element> iterator = elementsByTag.iterator();
+                while (iterator.hasNext()) {
+                    Element element = iterator.next();
+                    Attributes attributes = element.attributes();
+                    if (attributes.hasKey("onmouseover")) {
+                        //城市单独处理
+                        if ("changColorOver(5);".equals(attributes.get("onmouseover"))) {
+                            Elements select = element.select("[class=sel-city-td-sf]");
+                            //查询出所有的省市
+                            for (int i = 0; i < select.size(); i++) {
+                                //取到某个省以及下属市
+                                String provinceName = "";
+                                Elements a = select.get(i).parent().getElementsByTag("a");
+                                for (int j = 0; j < a.size(); j++) {
+                                    if (j == 0) {
+                                        //省名称
+                                        provinceName = a.get(j).text().replace(":", "").trim();
+                                        TypeConfig typeConfig = new TypeConfig();
+                                        typeConfig.setCode(provinceName);
+                                        typeConfig.setName(provinceName);
+                                        typeConfig.setGroup("city");
+                                        System.out.println(typeConfig);
+                                        configService.insert(typeConfig);
+                                    } else {
+                                        //市名称
+                                        TypeConfig typeConfig = new TypeConfig();
+                                        typeConfig.setCode(provinceName);
+                                        typeConfig.setName(a.get(j).text().trim());
+                                        typeConfig.setGroup("city");
+                                        System.out.println(typeConfig);
+                                        configService.insert(typeConfig);
+                                    }
+                                }
+                            }
+                        }
+                        Elements aTags = element.getElementsByTag("a");
+                        Iterator<Element> aiterator = aTags.iterator();
+                        while (aiterator.hasNext()) {
+                            Element aNext = aiterator.next();
+                            String onclick1 = aNext.attributes().get("onclick");
+                            if (!StringUtils.isEmpty(onclick1)) {
+                                TypeConfig typeConfig = new TypeConfig();
+                                String onclick = onclick1.substring(8, 9);
+                                switch (onclick) {
+                                    case "1":
+                                        typeConfig.setCode("类型");
+                                        typeConfig.setGroup("type");
+                                        typeConfig.setName(aNext.text().trim());
+                                        System.out.println(typeConfig);
+                                        break;
+                                    case "2":
+                                        typeConfig.setCode("运营方");
+                                        typeConfig.setGroup("operator");
+                                        typeConfig.setName(aNext.text().trim());
+                                        System.out.println(typeConfig);
+                                        break;
+                                    case "3":
+                                        typeConfig.setCode("桩品牌");
+                                        typeConfig.setGroup("brand");
+                                        typeConfig.setName(aNext.text().trim());
+                                        System.out.println(typeConfig);
+                                        break;
+                                    case "4":
+                                        typeConfig.setCode("运营状态");
+                                        typeConfig.setGroup("opeStatus");
+                                        typeConfig.setName(aNext.text().trim());
+                                        System.out.println(typeConfig);
+                                        break;
+                                }
+                                configService.insert(typeConfig);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }finally {
+            fileOutputStream.close();
         }
-    }*/
+    }
+
+    @Test
+    public void getAllCities() {
+        List<TypeConfig> city = configService.selectListByGroup("city");
+        System.out.println(city);
+    }
 }

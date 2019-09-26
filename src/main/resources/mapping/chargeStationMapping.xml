@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kyle.crawler.dao.ChargeStationMapper">
+    <resultMap id="chargeStationMap" type="com.kyle.crawler.entity.ChargeStation">
+        <id property="id" column="id"/>
+        <result property="stationName" column="station_name"/>
+        <result property="stationAddr" column="station_addr"/>
+        <result property="fastCount" column="fast_count"/>
+        <result property="slowCount" column="slow_count"/>
+        <result property="jingDu" column="jing_du"/>
+        <result property="weiDu" column="wei_du"/>
+        <result property="isOpen" column="is_open"/>
+        <result property="operation" column="operation"/>
+        <result property="testInfo" column="test_info"/>
+        <result property="otherInfo" column="other_info"/>
+        <result property="payType" column="pay_type"/>
+        <result property="dianFee" column="dian_fee"/>
+        <result property="serviceFee" column="service_fee"/>
+        <result property="parkFee" column="park_fee"/>
+        <result property="openTime" column="open_time"/>
+        <result property="city" column="city"/>
+        <result property="province" column="province"/>
+        <result property="area" column="area"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.kyle.crawler.entity.ChargeStation">
+        insert into crawler.charge_station (station_name, station_addr, fast_count, slow_count, jing_du, wei_du, is_open, operation,
+                                            test_info, other_info, pay_type, dian_fee, service_fee, park_fee, open_time, city, province, area)
+        VALUES (#{stationName},#{stationAddr},#{fastCount},#{slowCount},#{jingDu},
+                               #{weiDu},#{isOpen},#{operation},#{testInfo},#{otherInfo},
+                               #{payType},#{dianFee},#{serviceFee},#{parkFee},
+                #{openTime},#{city},#{province},#{area})
+    </insert>
+
+    <select id="getList" resultMap="chargeStationMap">
+        select * from crawler.charge_station
+    </select>
+
+    <update id="update" parameterType="com.kyle.crawler.entity.ChargeStation">
+        update crawler.charge_station t
+        <set>
+            t.city = #{city},t.area = #{area}
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
