@@ -1,6 +1,6 @@
 package com.kyle.crawler.service.impl;
 
-import com.kyle.crawler.dao.ChargeStationMapper;
+import com.kyle.crawler.mapper.ChargeStationMapper;
 import com.kyle.crawler.entity.ChargeStation;
 import com.kyle.crawler.service.IChargeStationService;
 import org.springframework.stereotype.Service;

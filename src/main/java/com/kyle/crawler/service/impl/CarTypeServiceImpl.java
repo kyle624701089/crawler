@@ -1,6 +1,6 @@
 package com.kyle.crawler.service.impl;
 
-import com.kyle.crawler.dao.CarTypeMapper;
+import com.kyle.crawler.mapper.CarTypeMapper;
 import com.kyle.crawler.entity.CarType;
 import com.kyle.crawler.service.ICarTypeService;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.kyle.crawler.service.impl;
 
-import com.kyle.crawler.dao.TypeConfigMapper;
+import com.kyle.crawler.mapper.TypeConfigMapper;
 import com.kyle.crawler.entity.TypeConfig;
 import com.kyle.crawler.service.ITypeConfigService;
 import org.springframework.stereotype.Service;

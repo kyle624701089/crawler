@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.kyle.crawler.dao.CarTypeMapper">
-    <resultMap id="carTypeMap" type="CarType">
+<mapper namespace="com.kyle.crawler.mapper.CarTypeMapper">
+    <resultMap id="carTypeMap" type="com.kyle.crawler.entity.CarType">
         <id property="id" column="ID"/>
         <result property="name" column="NAME"/>
         <result property="carBrandId" column="CAR_BRAND_ID"/>
-        <collection property="cars" column="ID" select="com.kyle.crawler.dao.CarMapper.findListCarByCarTypeId"/>
+        <collection property="cars" column="ID" select="com.kyle.crawler.mapper.CarMapper.findListCarByCarTypeId"/>
     </resultMap>
 
-    <insert id="addCarType" parameterType="CarType">
+    <insert id="addCarType" parameterType="com.kyle.crawler.entity.CarType">
         INSERT INTO car_type VALUES (#{id},#{name},#{carBrandId})
     </insert>
 

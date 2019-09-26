@@ -1,4 +1,4 @@
-package com.kyle.crawler.dao;
+package com.kyle.crawler.mapper;
 
 import com.kyle.crawler.entity.CarBrand;
 import org.apache.ibatis.annotations.Mapper;
