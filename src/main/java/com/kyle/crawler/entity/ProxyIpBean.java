@@ -1,5 +1,7 @@
 package com.kyle.crawler.entity;
 
+import lombok.Data;
+
 /**
  * @ ClassName: ProxyIpBean
  * @ Description: 代理bean

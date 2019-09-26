@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
-//@EnableCaching
 @MapperScan("com.kyle.crawler.dao")
 public class CrawlerApplication {
 
